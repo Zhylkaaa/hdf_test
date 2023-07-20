@@ -29,6 +29,7 @@ if __name__ == '__main__':
     with h5py.File(f'dense/data.hdf5', 'w') as d:
         dataset = d.create_dataset('images',
                                    shape=(0, focal_plains, H, W),
+                                   dtype=np.uint8,
                                    maxshape=(None, focal_plains, H, W),
                                    chunks=chunk_size)
 
