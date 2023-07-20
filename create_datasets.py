@@ -35,9 +35,12 @@ if __name__ == '__main__':
         offset = 0
         cum_seq_lens = []
 
+        buffer = []
+
         for image_id in tqdm(range(num_examples)):
             seq_len = int(np.random.normal(loc=sum(seq_len_range)/2, scale=0.5))
             random_image_sequence = np.random.randint(0, 255, size=(seq_len, focal_plains, H, W), dtype=np.uint8)
+            buffer.append(random_image_sequence)
             offset += seq_len
             cum_seq_lens.append(offset)
 
@@ -50,14 +53,18 @@ if __name__ == '__main__':
                     dset[()] = random_image_sequence
                 sparse_writes.append(time.time() - s)
             s = time.time()
-            dataset.resize(offset, axis=0)
-            dataset[-seq_len:] = random_image_sequence
-            dense_writes.append(time.time() - s)
 
-            if image_id % 100 == 0:
+            if (image_id + 1) % 100 == 0:
+                dataset.resize(offset, axis=0)
+                buffer = np.concatenate(buffer)
+                dataset[-buffer.shape[0]:] = buffer
+                buffer = []
+                dense_writes.append(time.time() - s)
+
+            if (image_id + 1) % 100 == 0:
                 if sparse_writes:
                     print('sparse rolling mean [s]:', sum(sparse_writes[-100:]) / 100)
-                print('dense rolling mean [s]:', sum(dense_writes[-100:]) / 100)
+                print('dense rolling mean [s]:', dense_writes[-1])
         dataset.attrs['cum_seq_len'] = cum_seq_lens
 
     if sparse_writes:
