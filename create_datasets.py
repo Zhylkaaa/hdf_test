@@ -54,7 +54,7 @@ if __name__ == '__main__':
                 sparse_writes.append(time.time() - s)
             s = time.time()
 
-            if (image_id + 1) % 100 == 0:
+            if (image_id + 1) % 10 == 0:
                 dataset.resize(offset, axis=0)
                 buffer = np.concatenate(buffer)
                 dataset[-buffer.shape[0]:] = buffer
@@ -64,7 +64,7 @@ if __name__ == '__main__':
             if (image_id + 1) % 100 == 0:
                 if sparse_writes:
                     print('sparse rolling mean [s]:', sum(sparse_writes[-100:]) / 100)
-                print('dense rolling mean [s]:', dense_writes[-1])
+                print('dense rolling mean [s]:', dense_writes[-10] / 10)
         dataset.attrs['cum_seq_len'] = cum_seq_lens
 
     if sparse_writes:
