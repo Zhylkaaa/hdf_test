@@ -19,7 +19,7 @@ class SparseDataset(Dataset):
         return self.num_files
 
     def __getitem__(self, index):
-        with h5py.File(os.path.join(self.data_path, str(index))) as f:
+        with h5py.File(os.path.join(self.data_path, str(index)+'.hdf5')) as f:
             images = f['image']
             sampled_idxs = np.random.randint(0, images.shape[0], size=self.num_samples)
             return images[sampled_idxs, self.focal_start:self.focal_end]
