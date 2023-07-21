@@ -21,7 +21,8 @@ class SparseDataset(Dataset):
     def __getitem__(self, index):
         with h5py.File(os.path.join(self.data_path, str(index)+'.hdf5')) as f:
             images = f['image']
-            sampled_idxs = np.random.randint(0, images.shape[0], size=self.num_samples)
+            sampled_idxs = np.arange(0, images.shape[0], dtype=np.int64)
+            sampled_idxs = np.random.choice(sampled_idxs, replace=False, size=self.num_samples)
             sampled_idxs.sort()
             return images[sampled_idxs, self.focal_start:self.focal_end]
 
@@ -62,8 +63,8 @@ class DenseDataset(Dataset):
     def __getitem__(self, index):
         offset = self.cum_seq_lens[index - 1] if index else 0
         #seq_len = self.cum_seq_lens[index] - offset
-
-        sampled_idxs = np.random.randint(offset, self.cum_seq_lens[index], size=self.num_samples)
+        sampled_idxs = np.arange(offset, self.cum_seq_lens[index], dtype=np.int64)
+        sampled_idxs = np.random.choice(sampled_idxs,  replace=False, size=self.num_samples)
         sampled_idxs.sort()
         return self.images[sampled_idxs, self.focal_start:self.focal_end]
 
