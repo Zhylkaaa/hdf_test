@@ -30,7 +30,7 @@ if __name__ == '__main__':
                     batch = test_dataloader(data_path, num_workers, batch_size)
                     e = time.time()
                     times.append(e - s)
-                print(batch.shape, batch.dtype, batch.nbytes)
+                print(batch.shape, batch.dtype)
                 test_results[f'{data_path}_{num_workers}_{batch_size}'] = sum(times) / len(times)
                 print(sum(times) / len(times))
 
