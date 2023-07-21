@@ -61,9 +61,9 @@ class DenseDataset(Dataset):
 
     def __getitem__(self, index):
         offset = self.cum_seq_lens[index - 1] if index else 0
-        seq_len = self.cum_seq_lens[index] - offset
+        #seq_len = self.cum_seq_lens[index] - offset
 
-        sampled_idxs = np.random.randint(offset, seq_len, size=self.num_samples)
+        sampled_idxs = np.random.randint(offset, self.cum_seq_lens[index], size=self.num_samples)
         sampled_idxs.sort()
         return self.images[sampled_idxs, self.focal_start:self.focal_end]
 
