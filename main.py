@@ -32,6 +32,7 @@ if __name__ == '__main__':
                     times.append(e - s)
                 print(batch.shape, batch.dtype, batch.nbytes)
                 test_results[f'{data_path}_{num_workers}_{batch_size}'] = sum(times) / len(times)
+                print(sum(times) / len(times))
 
     with open('speed_test_datasets.json', 'w') as f:
         json.dump(test_results, f)
