@@ -18,7 +18,7 @@ if __name__ == '__main__':
     focal_plains = 7
     seq_len_range = (200, 600)
 
-    write_sparse = bool(sys.argv[2])
+    write_sparse = int(sys.argv[2])
     chunk_size = tuple(map(int, sys.argv[3:]))
     if not chunk_size:
         chunk_size = (1, focal_plains, H, W)
