@@ -53,7 +53,7 @@ class DenseDataset(Dataset):
         # Restore instance attributes
         self.__dict__.update(state)
         # Restore hdf5 dataset.
-        self.data = h5py.File(self.data_path)
+        self.data = h5py.File(os.path.join(self.data_path, 'data.hdf5'))
         self.images = self.data['images']
         self.cum_seq_lens = self.images.attrs['cum_seq_len']
 
