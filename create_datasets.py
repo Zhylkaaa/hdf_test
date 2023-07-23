@@ -31,7 +31,8 @@ if __name__ == '__main__':
                                    shape=(0, focal_plains, H, W),
                                    dtype=np.uint8,
                                    maxshape=(None, focal_plains, H, W),
-                                   chunks=chunk_size)
+                                   chunks=chunk_size,
+                                   compression='gzip')
 
         offset = 0
         cum_seq_lens = []
@@ -50,7 +51,8 @@ if __name__ == '__main__':
                 with h5py.File(f'sparse/{image_id}.hdf5', 'w') as f:
                     dset = f.create_dataset('image',
                                             data=random_image_sequence,
-                                            chunks=chunk_size)
+                                            chunks=chunk_size,
+                                            compression='gzip')
                     dset[()] = random_image_sequence
                 sparse_writes.append(time.time() - s)
             s = time.time()

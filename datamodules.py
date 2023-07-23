@@ -69,21 +69,21 @@ class DenseDataset(Dataset):
         return self.images[sampled_idxs, self.focal_start:self.focal_end]
 
 
-def get_sparse_dataloader(data_path, num_samples=20, batch_size=1, num_workers=0, context='spawn'):
+def get_sparse_dataloader(data_path, num_samples=20, batch_size=1, num_workers=0, context='spawn', shuffle=True):
     return DataLoader(
         SparseDataset(data_path, num_samples),
         batch_size=batch_size,
         num_workers=num_workers,
-        shuffle=True,
+        shuffle=shuffle,
         multiprocessing_context=get_context(context) if num_workers else None
     )
 
 
-def get_dense_dataloader(data_path, num_samples=20, batch_size=1, num_workers=0, context='spawn'):
+def get_dense_dataloader(data_path, num_samples=20, batch_size=1, num_workers=0, context='spawn', shuffle=True):
     return DataLoader(
         DenseDataset(data_path, num_samples),
         batch_size=batch_size,
         num_workers=num_workers,
-        shuffle=True,
+        shuffle=shuffle,
         multiprocessing_context=get_context(context) if num_workers else None
     )
