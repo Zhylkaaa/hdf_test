@@ -24,7 +24,7 @@ class SparseDataset(Dataset):
             sampled_idxs = np.arange(0, images.shape[0], dtype=np.int64)
             sampled_idxs = np.random.choice(sampled_idxs, replace=False, size=self.num_samples)
             sampled_idxs.sort()
-            return images[sampled_idxs, self.focal_start:self.focal_end]
+            return np.stack([images[idx, self.focal_start:self.focal_end] for idx in sampled_idxs])
 
 
 class DenseDataset(Dataset):
@@ -66,7 +66,7 @@ class DenseDataset(Dataset):
         sampled_idxs = np.arange(offset, self.cum_seq_lens[index], dtype=np.int64)
         sampled_idxs = np.random.choice(sampled_idxs,  replace=False, size=self.num_samples)
         sampled_idxs.sort()
-        return self.images[sampled_idxs, self.focal_start:self.focal_end]
+        return np.stack([self.images[idx, self.focal_start:self.focal_end] for idx in sampled_idxs])
 
 
 def get_sparse_dataloader(data_path, num_samples=20, batch_size=1, num_workers=0, context='spawn', shuffle=True):
