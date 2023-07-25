@@ -1,6 +1,5 @@
 import time
 import json
-from collections import defaultdict
 
 from tqdm import tqdm
 
@@ -21,9 +20,9 @@ def test_dataloader(data_path, num_workers, batch_size):
 if __name__ == '__main__':
     test_results = {}
 
-    for num_workers in [0, 1, 2, 4, 10]:
-        for batch_size in [2, 32]:
-            for data_path in ['sparse', 'dense']:
+    for num_workers in [0, 2]:
+        for batch_size in [2]:
+            for data_path in ['dense']:
                 times = []
                 for i in range(3):
                     s = time.time()

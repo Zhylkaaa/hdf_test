@@ -19,7 +19,8 @@ if __name__ == '__main__':
     seq_len_range = (200, 600)
 
     write_sparse = int(sys.argv[2])
-    chunk_size = tuple(map(int, sys.argv[3:]))
+    use_compression = int(sys.argv[3])
+    chunk_size = tuple(map(int, sys.argv[4:]))
     if not chunk_size:
         chunk_size = (1, focal_plains, H, W)
 
@@ -32,7 +33,7 @@ if __name__ == '__main__':
                                    dtype=np.uint8,
                                    maxshape=(None, focal_plains, H, W),
                                    chunks=chunk_size,
-                                   compression='gzip')
+                                   compression='gzip' if use_compression else None)
 
         offset = 0
         cum_seq_lens = []
@@ -52,12 +53,12 @@ if __name__ == '__main__':
                     dset = f.create_dataset('image',
                                             data=random_image_sequence,
                                             chunks=chunk_size,
-                                            compression='gzip')
+                                            compression='gzip' if use_compression else None)
                     dset[()] = random_image_sequence
                 sparse_writes.append(time.time() - s)
-            s = time.time()
 
-            if (image_id + 1) % 10 == 0:
+            if (image_id + 1) % 100 == 0:
+                s = time.time()
                 dataset.resize(offset, axis=0)
                 buffer = np.concatenate(buffer)
                 dataset[-buffer.shape[0]:] = buffer
@@ -67,7 +68,7 @@ if __name__ == '__main__':
             if (image_id + 1) % 100 == 0:
                 if sparse_writes:
                     print('sparse rolling mean [s]:', sum(sparse_writes[-100:]) / 100)
-                print('dense rolling mean [s]:', dense_writes[-10] / 10)
+                print('dense rolling mean [s]:', dense_writes[-1] / 100)
         dataset.attrs['cum_seq_len'] = cum_seq_lens
 
     if sparse_writes:
