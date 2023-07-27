@@ -6,7 +6,7 @@ cd pdf_test
 
 for num_examples in 2 4 8 16 20 32;
 do
-  python create_datasets.py ${i} 0 0
+  python create_datasets.py ${num_examples} 0 0
   mv dense_times.pkl $SCRATCH/pdf_test/dense_times_tmpdata_${i}.pkl
   python main.py
   mv speed_test_datasets.json $SCRATCH/pdf_test/speed_test_datasets_tmpdata_${i}.json
@@ -15,7 +15,7 @@ done
 cd $SCRATCH/pdf_test
 for num_examples in 2 4 8 16 20 32;
 do
-  python create_datasets.py ${i} 0 0
+  python create_datasets.py ${num_examples} 0 0
   mv dense_times.pkl $SCRATCH/pdf_test/dense_times_scratch_${i}.pkl
   python main.py
   mv speed_test_datasets.json $SCRATCH/pdf_test/speed_test_datasets_scratch_${i}.jsoncd
