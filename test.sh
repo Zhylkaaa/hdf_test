@@ -5,7 +5,7 @@ cp -r $SCRATCH/pdf_test .
 cd pdf_test
 
 for num_examples in 2 4 8 16 20 32;
-then
+do
   python create_datasets.py ${i} 0 0
   mv dense_times.pkl $SCRATCH/pdf_test/dense_times_tmpdata_${i}.pkl
   python main.py
@@ -14,7 +14,7 @@ done
 
 cd $SCRATCH/pdf_test
 for num_examples in 2 4 8 16 20 32;
-then
+do
   python create_datasets.py ${i} 0 0
   mv dense_times.pkl $SCRATCH/pdf_test/dense_times_scratch_${i}.pkl
   python main.py
