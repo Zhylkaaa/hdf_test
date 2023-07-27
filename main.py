@@ -21,7 +21,7 @@ if __name__ == '__main__':
     test_results = {}
 
     for num_workers in [0, 2]:
-        for batch_size in [2]:
+        for batch_size in [1, 2]:
             for data_path in ['dense']:
                 times = []
                 for i in range(3):
@@ -29,7 +29,7 @@ if __name__ == '__main__':
                     batch = test_dataloader(data_path, num_workers, batch_size)
                     e = time.time()
                     times.append(e - s)
-                print(batch.shape, batch.dtype)
+                print(times)
                 test_results[f'{data_path}_{num_workers}_{batch_size}'] = sum(times) / len(times)
                 print(sum(times) / len(times))
 
