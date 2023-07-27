@@ -71,13 +71,13 @@ if __name__ == '__main__':
                 print('dense rolling mean [s]:', dense_writes[-1] / 100)
         dataset.attrs['cum_seq_len'] = cum_seq_lens
 
-    if buffer:
-        s = time.time()
-        dataset.resize(offset, axis=0)
-        buffer = np.concatenate(buffer)
-        dataset[-buffer.shape[0]:] = buffer
-        buffer = []
-        dense_writes.append(time.time() - s)
+        if buffer:
+            s = time.time()
+            dataset.resize(offset, axis=0)
+            buffer = np.concatenate(buffer)
+            dataset[-buffer.shape[0]:] = buffer
+            buffer = []
+            dense_writes.append(time.time() - s)
 
     if sparse_writes:
         with open('sparse_times.pkl', 'wb') as f:
