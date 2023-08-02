@@ -80,8 +80,8 @@ def get_sparse_dataloader(data_path, num_samples=20, batch_size=1, num_workers=0
 
 
 def get_dense_dataloader(data_path, num_samples=20, batch_size=1, num_workers=0, context='spawn', shuffle=True):
-    np.random.seed(0)
-    torch.random.manual_seed(0)
+    # np.random.seed(0)
+    # torch.random.manual_seed(0)
     return DataLoader(
         DenseDataset(data_path, num_samples),
         batch_size=batch_size,

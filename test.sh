@@ -1,10 +1,11 @@
 conda activate hdf
 
 cd /tmpdata/dz2449/${SLURM_JOB_ID}
+rm -r $SCRATCH/pdf_test/dense
 cp -r $SCRATCH/pdf_test .
 cd pdf_test
 
-for i in 2 4 8 16 20 32
+for i in 2 4 8 16 20 32 64 128 256
 do
   python create_datasets.py ${i} 0 0
   mv dense_times.pkl $SCRATCH/pdf_test/dense_times_tmpdata_${i}.pkl
@@ -15,7 +16,7 @@ do
 done
 
 cd $SCRATCH/pdf_test
-for i in 2 4 8 16 20 32
+for i in 2 4 8 16 20 32 64 128 256
 do
   python create_datasets.py ${i} 0 0
   mv dense_times.pkl $SCRATCH/pdf_test/dense_times_scratch_${i}.pkl
