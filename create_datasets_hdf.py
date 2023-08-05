@@ -31,8 +31,7 @@ if __name__ == '__main__':
                                    shape=(0, focal_plains, H, W),
                                    dtype=np.uint8,
                                    maxshape=(None, focal_plains, H, W),
-                                   chunks=chunk_size,
-                                   compression='gzip')
+                                   chunks=chunk_size)
 
         offset = 0
         cum_seq_lens = []
@@ -51,8 +50,7 @@ if __name__ == '__main__':
                 with h5py.File(f'sparse/{image_id}.hdf5', 'w') as f:
                     dset = f.create_dataset('image',
                                             data=random_image_sequence,
-                                            chunks=chunk_size,
-                                            compression='gzip')
+                                            chunks=chunk_size)
                     dset[()] = random_image_sequence
                 sparse_writes.append(time.time() - s)
             s = time.time()
@@ -68,6 +66,12 @@ if __name__ == '__main__':
                 if sparse_writes:
                     print('sparse rolling mean [s]:', sum(sparse_writes[-100:]) / 100)
                 print('dense rolling mean [s]:', dense_writes[-10] / 10)
+        if buffer:
+            dataset.resize(offset, axis=0)
+            buffer = np.concatenate(buffer)
+            dataset[-buffer.shape[0]:] = buffer
+            buffer = []
+            dense_writes.append(time.time() - s)
         dataset.attrs['cum_seq_len'] = cum_seq_lens
 
     if sparse_writes:

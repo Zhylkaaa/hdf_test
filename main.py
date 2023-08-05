@@ -4,16 +4,19 @@ from collections import defaultdict
 
 from tqdm import tqdm
 
-from datamodules import get_dense_dataloader, get_sparse_dataloader
+from datamodules import get_dense_dataloader, get_sparse_dataloader, get_binary_dataloader
+
+dataloaders_map = {
+    'sparse': get_sparse_dataloader,
+    'dense': get_dense_dataloader,
+    'binary': get_binary_dataloader
+}
 
 
 def test_dataloader(data_path, num_workers, batch_size):
-    if data_path == 'sparse':
-        dataloader = get_sparse_dataloader(data_path, batch_size=batch_size, num_workers=num_workers)
-    else:
-        dataloader = get_dense_dataloader(data_path, batch_size=batch_size, num_workers=num_workers)
+    dataloader = dataloaders_map[data_path](data_path, batch_size=batch_size, num_workers=num_workers)
 
-    for batch in dataloader:
+    for batch in tqdm(dataloader):
         pass
     return batch
 
@@ -21,9 +24,9 @@ def test_dataloader(data_path, num_workers, batch_size):
 if __name__ == '__main__':
     test_results = {}
 
-    for num_workers in [0, 1, 2, 4, 10]:
+    for num_workers in [0, 2]:
         for batch_size in [2, 32]:
-            for data_path in ['sparse', 'dense']:
+            for data_path in ['dense', 'binary']:
                 times = []
                 for i in range(3):
                     s = time.time()
