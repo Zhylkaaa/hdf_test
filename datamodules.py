@@ -85,12 +85,12 @@ class BinaryDataset(Dataset):
     def _load_memmap(self):
         self.f = open(os.path.join(self.data_path, 'data.dat'), 'rb')
         self.mm = mmap.mmap(self.f.fileno(), 0, access=mmap.ACCESS_READ)
-        self.mm.madvise(mmap.MADV_WILLNEED | mmap.MADV_SEQUENTIAL)
-        try:
-            self.mm.madvise(mmap.MADV_HUGEPAGE)
-        except Exception as e:
-            print('Failed to initialize HUGEPAGE')
-            print(e)
+        self.mm.madvise(mmap.MADV_WILLNEED)
+        # try:
+        #     self.mm.madvise(mmap.MADV_HUGEPAGE)
+        # except Exception as e:
+        #     print('Failed to initialize HUGEPAGE')
+        #     print(e)
 
         with open(os.path.join(self.data_path, 'metadata.pkl'), 'rb') as f:
             metadata = pkl.load(f)
@@ -102,6 +102,7 @@ class BinaryDataset(Dataset):
         self.focal_offset_start = self.focal_start * self.image_size
         self.focal_offset_end = self.focal_end * self.image_size
         self.images = np.frombuffer(self.mm, dtype=metadata['dtype'])
+        self.executor = ThreadPoolExecutor(max_workers=self.num_samples)
 
     def __getstate__(self):
         # Copy the object's state from self.__dict__ which contains
@@ -112,6 +113,7 @@ class BinaryDataset(Dataset):
         del state['mm']
         del state['images']
         del state['f']
+        del state['executor']
         return state
 
     def __setstate__(self, state):
@@ -123,6 +125,10 @@ class BinaryDataset(Dataset):
     def __len__(self):
         return len(self.cum_seq_lens)
 
+    def _select_id(self, idx):
+        return self.images[idx * self.example_size + self.focal_offset_start:
+                           idx * self.example_size + self.focal_offset_end]
+
     # TODO: verify correctness
     def __getitem__(self, index):
         offset = self.cum_seq_lens[index - 1] if index else 0
@@ -130,13 +136,12 @@ class BinaryDataset(Dataset):
         sampled_idxs = np.arange(offset, self.cum_seq_lens[index], dtype=np.int64)
         sampled_idxs = np.random.choice(sampled_idxs,  replace=False, size=self.num_samples)
         sampled_idxs.sort()
-        with ThreadPoolExecutor(max_workers=self.num_samples) as executor:
-            return np.stack(
-                list(executor.map(lambda idx: self.images[idx * self.example_size + self.focal_offset_start:
-                                                     idx * self.example_size + self.focal_offset_end], sampled_idxs))
-            ).reshape(self.num_samples,
-                      self.focal_end - self.focal_start,
-                      *self.example_shape[-2:])
+        #with ThreadPoolExecutor(max_workers=self.num_samples) as executor:
+        return np.stack(
+            list(self.executor.map(self._select_id, sampled_idxs))
+        ).reshape(self.num_samples,
+                  self.focal_end - self.focal_start,
+                  *self.example_shape[-2:])
             # return np.stack([self.images[idx * self.example_size + self.focal_offset_start:
             #                              idx * self.example_size + self.focal_offset_end]
             #                  for idx in sampled_idxs]).reshape(self.num_samples,
