@@ -132,8 +132,8 @@ class BinaryDataset(Dataset):
         sampled_idxs.sort()
         with ThreadPoolExecutor(max_workers=self.num_samples) as executor:
             return np.stack(
-                executor.map(lambda idx: self.images[idx * self.example_size + self.focal_offset_start:
-                                                     idx * self.example_size + self.focal_offset_end], sampled_idxs)
+                list(executor.map(lambda idx: self.images[idx * self.example_size + self.focal_offset_start:
+                                                     idx * self.example_size + self.focal_offset_end], sampled_idxs))
             ).reshape(self.num_samples,
                       self.focal_end - self.focal_start,
                       *self.example_shape[-2:])
