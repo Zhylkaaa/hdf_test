@@ -6,6 +6,7 @@ import h5py
 import numpy as np
 import pickle as pkl
 import mmap
+from concurrent.futures import ThreadPoolExecutor
 
 
 class SparseDataset(Dataset):
@@ -129,11 +130,18 @@ class BinaryDataset(Dataset):
         sampled_idxs = np.arange(offset, self.cum_seq_lens[index], dtype=np.int64)
         sampled_idxs = np.random.choice(sampled_idxs,  replace=False, size=self.num_samples)
         sampled_idxs.sort()
-        return np.stack([self.images[idx * self.example_size + self.focal_offset_start:
-                                     idx * self.example_size + self.focal_offset_end]
-                         for idx in sampled_idxs]).reshape(self.num_samples,
-                                                           self.focal_end - self.focal_start,
-                                                           *self.example_shape[-2:])
+        with ThreadPoolExecutor(max_workers=self.num_samples) as executor:
+            return np.stack(
+                executor.map(lambda idx: self.images[idx * self.example_size + self.focal_offset_start:
+                                                     idx * self.example_size + self.focal_offset_end], sampled_idxs)
+            ).reshape(self.num_samples,
+                      self.focal_end - self.focal_start,
+                      *self.example_shape[-2:])
+            # return np.stack([self.images[idx * self.example_size + self.focal_offset_start:
+            #                              idx * self.example_size + self.focal_offset_end]
+            #                  for idx in sampled_idxs]).reshape(self.num_samples,
+            #                                                    self.focal_end - self.focal_start,
+            #                                                    *self.example_shape[-2:])
 
 
 def get_sparse_dataloader(data_path, num_samples=20, batch_size=1, num_workers=0, context='spawn', shuffle=True):
